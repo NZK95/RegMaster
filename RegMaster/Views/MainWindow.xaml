@@ -1,0 +1,940 @@
+﻿<Window x:Class="RegMaster.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RegMaster"
+        mc:Ignorable="d"
+        Title="RegMaster" Height="1080" Width="1920" 
+        Background="#1A1A1A" Foreground="White" FontSize="17"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize">
+
+    <Window.Resources>
+        <DataTemplate x:Key="PciDeviceTemplate">
+            <Border x:Name="DeviceBorder"
+            Background="#252525"
+            BorderBrush="#3A3A3A"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="12"
+            Margin="0,0,0,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Device Name (BDF + Vendor + Device) -->
+                    <TextBlock Grid.Column="0" Grid.Row="0"
+                       Text="{Binding DisplayName}"
+                       Foreground="#D0D0D0"
+                       FontSize="13"
+                       FontWeight="Medium"
+                       TextTrimming="CharacterEllipsis"/>
+
+                    <!-- Vendor ID and Device ID -->
+                    <TextBlock Grid.Column="0" Grid.Row="1"
+                       Text="{Binding Details}"
+                       Foreground="#707070"
+                       FontSize="11"
+                       Margin="0,4,0,0"
+                       TextTrimming="CharacterEllipsis"/>
+
+                    <!-- Status Indicator (Right) -->
+                    <StackPanel Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                        VerticalAlignment="Center"
+                        Margin="16,0,0,0"
+                        Orientation="Vertical">
+                        <Ellipse Width="10" Height="10"
+                         Fill="#707070"
+                         HorizontalAlignment="Right"
+                         Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding Bus, StringFormat='Bus: {0:X2}'}"
+                           Foreground="#909090"
+                           FontSize="10"
+                           TextAlignment="Right"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <DataTemplate.Triggers>
+                <!-- Hover Effect -->
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="DeviceBorder" Property="Background" Value="#3A3A3A"/>
+                    <Setter TargetName="DeviceBorder" Property="BorderBrush" Value="#888888"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- ListBox Style для PCI Devices -->
+        <Style TargetType="ListBox" x:Key="PciDeviceListBoxStyle">
+            <Setter Property="Background" Value="#1A1A1A"/>
+            <Setter Property="BorderBrush" Value="#3A3A3A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#D0D0D0"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Foreground" Value="#D0D0D0"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="Transparent"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="Transparent"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Color x:Key="PrimaryColor">#888888</Color>
+        <Color x:Key="AccentColor">#666666</Color>
+        <Color x:Key="DarkBg">#1A1A1A</Color>
+        <Color x:Key="CardBg">#252525</Color>
+        <Color x:Key="BorderColor">#3A3A3A</Color>
+        <Color x:Key="SuccessColor">#707070</Color>
+        <Color x:Key="TextSecondary">#909090</Color>
+
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#888888"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#666666"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#252525"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#3A3A3A"/>
+
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="#1A1A1A"/>
+            <Setter Property="BorderBrush" Value="#3A3A3A"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Tab Header Background -->
+                            <Border Grid.Row="0" Background="#252525" BorderBrush="#3A3A3A" 
+                                    BorderThickness="0,0,0,1" Padding="0">
+                                <TabPanel IsItemsHost="True" Margin="20,0,20,0"/>
+                            </Border>
+
+                            <!-- Tab Content -->
+                            <ContentPresenter Grid.Row="1" x:Name="PART_SelectedContentHost" 
+                                            ContentSource="SelectedContent" Margin="0"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для TabItem -->
+        <Style TargetType="TabItem">
+            <Setter Property="Foreground" Value="#909090"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="16,14"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Border" 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter x:Name="ContentSite" ContentSource="Header"
+                                            VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            TextBlock.FontSize="13" TextBlock.FontWeight="Medium"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" 
+                                        Value="{StaticResource PrimaryBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter TargetName="Border" Property="Background" Value="Transparent"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#B0B0B0"/>
+                                <Setter TargetName="Border" Property="Background" Value="#1A1A1A"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#555555"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#1A1A1A"/>
+            <Setter Property="Foreground" Value="#D0D0D0"/>
+            <Setter Property="BorderBrush" Value="#3A3A3A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="CaretBrush" Value="#888888"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" 
+                                        HorizontalScrollBarVisibility="Hidden" 
+                                        VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" 
+                                        Value="{StaticResource PrimaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для Button -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#505050"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderBrush" Value="#606060"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}" CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="border" Property="Background" Value="#606060"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter TargetName="border" Property="Background" Value="#505050"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#707070"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для CheckBox -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#D0D0D0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border x:Name="CheckBoxBorder"
+                                    Width="20" Height="20"
+                                    CornerRadius="4"
+                                    Background="#1A1A1A"
+                                    BorderBrush="#3A3A3A"
+                                    BorderThickness="1.5"
+                                    Margin="0,0,10,0">
+                                <TextBlock x:Name="CheckMark"
+                                          Text="✓"
+                                          FontSize="14"
+                                          Foreground="#707070"
+                                          FontWeight="Bold"
+                                          TextAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Visibility="Collapsed"/>
+                            </Border>
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="Background" Value="#3A3A3A"/>
+                                <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#707070"/>
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#888888"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="Background" Value="#252525"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для TextBlock (лейбл) -->
+        <Style TargetType="TextBlock" x:Key="LabelStyle">
+            <Setter Property="Foreground" Value="#909090"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="HeaderStyle">
+            <Setter Property="Foreground" Value="#888888"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,16,0,8"/>
+        </Style>
+    </Window.Resources>
+    <TabControl Background="#0D1117" BorderBrush="#30363D" Padding="0" Margin="0">
+        <TabItem Header="MSR" Background="#1A1A1A" Padding="20,12">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="#0D1117">
+                <Grid Background="#1A1A1A ">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="#1A1A1A  " CornerRadius="8" Padding="16" 
+                            BorderBrush="#30363D" BorderThickness="1" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource HeaderStyle}"/>
+                            <Grid Name="CoreGrid">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Content="All cores" Name="AllCoresCheckBox" 
+                                         VerticalContentAlignment="Center"
+                                         Checked="AllCores_Checked" Padding="8,4"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="1" Background="#1A1A1A " CornerRadius="8" Padding="16" 
+                            BorderBrush="#30363D" BorderThickness="1" Margin="0,16,0,0">
+                        <StackPanel>
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Style="{StaticResource LabelStyle}" Text="Address"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition  Width="20"/>
+                                        <ColumnDefinition Width="1*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="AddressTextBox" Text="0xE2 e.g." Foreground="#444444" Grid.Column="0" 
+                                            GotFocus="AddressTextBox_GotFocus" 
+                                            LostFocus="AddressTextBox_LostFocus"/>
+                                    <TextBox x:Name="BinaryTextBox" Grid.Column="2" 
+                                            Text="Binary" IsReadOnly="True"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Style="{StaticResource LabelStyle}" Text="Bit"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="1*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="BitTextBox" Foreground="#444444" Text="15 or 0 - 10" Grid.Column="0" 
+                                            GotFocus="BitTextBox_GotFocus" 
+                                            LostFocus="BitTextBox_LostFocus"/>
+                                    <TextBox x:Name="HexTextBox" Grid.Column="2" 
+                                            Text="Hex" IsReadOnly="True"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Style="{StaticResource LabelStyle}" Text="Value"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="1*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="ValueTextBox" Foreground="#444444" Text="Hex value"  Grid.Column="0" 
+                                            GotFocus="ValueTextBox_GotFocus" 
+                                            LostFocus="ValueTextBox_LostFocus"/>
+                                    <TextBox x:Name="DecimalTextBox" Grid.Column="2" 
+                                            Text="Decimal" IsReadOnly="True"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="ReadButton" Grid.Column="0" Content="Read" 
+                                       Click="ReadButton_Click" Height="36"/>
+                                <Button x:Name="WriteButton" Grid.Column="2" Content="Write" 
+                                       Click="WriteButton_Click" Height="36"/>
+                                <Button x:Name="ResetButton" Grid.Column="4" Content="Reset" 
+                                       Click="ResetButton_Click" Height="36" Background="#8B5A00" 
+                                       BorderBrush="#C9A350"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="2" Background="#1A1A1A " CornerRadius="8" Padding="16" 
+                            BorderBrush="#30363D" BorderThickness="1" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource HeaderStyle}" Text="Registry EAX (32-bit)"/>
+
+                            <Grid Name="EaxGrid" Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="0" x:Name="TextBox_0" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_0_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="1" x:Name="TextBox_1" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_1_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="2" x:Name="TextBox_2" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_2_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="3" x:Name="TextBox_3" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_3_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="4" x:Name="TextBox_4" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_4_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="5" x:Name="TextBox_5" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_5_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="6" x:Name="TextBox_6" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_6_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="7" x:Name="TextBox_7" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_7_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="8" x:Name="TextBox_8" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_8_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="9" x:Name="TextBox_9" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_9_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="10" x:Name="TextBox_10" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_10_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="11" x:Name="TextBox_11" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_11_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="12" x:Name="TextBox_12" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_12_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="13" x:Name="TextBox_13" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_13_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="14" x:Name="TextBox_14" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_14_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="15" x:Name="TextBox_15" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_15_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="16" x:Name="TextBox_16" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_16_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="17" x:Name="TextBox_17" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_17_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="18" x:Name="TextBox_18" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_18_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="19" x:Name="TextBox_19" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_19_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="20" x:Name="TextBox_20" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_20_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="21" x:Name="TextBox_21" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_21_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="22" x:Name="TextBox_22" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_22_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="23" x:Name="TextBox_23" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_23_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="24" x:Name="TextBox_24" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_24_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="25" x:Name="TextBox_25" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_25_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="26" x:Name="TextBox_26" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_26_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="27" x:Name="TextBox_27" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_27_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="28" x:Name="TextBox_28" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_28_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="29" x:Name="TextBox_29" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_29_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="30" x:Name="TextBox_30" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_30_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="31" x:Name="TextBox_31" Text="0" Background="#1A1A1A" MouseDoubleClick="TextBox_31_MouseDoubleClick"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="3" Background="#1A1A1A " CornerRadius="8" Padding="16" 
+                            BorderBrush="#30363D" BorderThickness="1" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource HeaderStyle}" Text="Registry EDX (32-bit)"/>
+                            <Grid Name="EdxGrid" Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="0" x:Name="TextEdxBox_0" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_0_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="1" x:Name="TextEdxBox_1" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_1_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="2" x:Name="TextEdxBox_2" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_2_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="3" x:Name="TextEdxBox_3" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_3_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="4" x:Name="TextEdxBox_4" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_4_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="5" x:Name="TextEdxBox_5" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_5_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="6" x:Name="TextEdxBox_6" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_6_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="7" x:Name="TextEdxBox_7" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_7_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="8" x:Name="TextEdxBox_8" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_8_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="9" x:Name="TextEdxBox_9" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_9_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="10" x:Name="TextEdxBox_10" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_10_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="11" x:Name="TextEdxBox_11" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_11_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="12" x:Name="TextEdxBox_12" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_12_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="13" x:Name="TextEdxBox_13" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_13_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="14" x:Name="TextEdxBox_14" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_14_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="15" x:Name="TextEdxBox_15" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_15_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="16" x:Name="TextEdxBox_16" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_16_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="17" x:Name="TextEdxBox_17" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_17_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="18" x:Name="TextEdxBox_18" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_18_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="19" x:Name="TextEdxBox_19" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_19_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="20" x:Name="TextEdxBox_20" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_20_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="21" x:Name="TextEdxBox_21" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_21_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="22" x:Name="TextEdxBox_22" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_22_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="23" x:Name="TextEdxBox_23" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_23_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="24" x:Name="TextEdxBox_24" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_24_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="25" x:Name="TextEdxBox_25" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_25_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="26" x:Name="TextEdxBox_26" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_26_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="27" x:Name="TextEdxBox_27" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_27_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="28" x:Name="TextEdxBox_28" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_28_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="29" x:Name="TextEdxBox_29" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_29_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="30" x:Name="TextEdxBox_30" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_30_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="31" x:Name="TextEdxBox_31" Text="0" Background="#1A1A1A" MouseDoubleClick="TextEdxBox_31_MouseDoubleClick"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Foreground="White" Margin="20,16,20,0" Grid.Row="4" x:Name="ApplyButton" Content="Apply" Click="ApplyButton_Click" Height="36"/>
+
+                </Grid>
+            </ScrollViewer>
+        </TabItem>
+
+        <TabItem Header="MMIO" Background="#1A1A1A" Padding="20,12" HorizontalAlignment="Left">
+            <Border Background="#1A1A1A" CornerRadius="8" Padding="16" BorderBrush="#30363D" BorderThickness="1" Margin="0,16,0,0">
+                <StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition  Width="40"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Style="{StaticResource LabelStyle}" Text="Address"/>
+                            <TextBlock Grid.Column="2"  Style="{StaticResource LabelStyle}" Text="Byte (8 bit)"/>
+
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition  Width="20"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="AddressTextBoxMMIO" Foreground="#444444" Text="0x53402024 e.g." Grid.Column="0" 
+                            GotFocus="AddressTextBoxMMIO_GotFocus" 
+                            LostFocus="AddressTextBoxMMIO_LostFocus"/>
+
+                            <TextBox x:Name="byteTextBox" Grid.Column="2" IsReadOnly="True"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Style="{StaticResource LabelStyle}" Text="Bit"/>
+                            <TextBlock  Grid.Column="2" Style="{StaticResource LabelStyle}" Text="Word (16 bit)"/>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="BitTextBoxMMIO"  Foreground="#444444" Text="15 or 0 - 10" Grid.Column="0" GotFocus="BitTextBoxMMIO_GotFocus"  LostFocus="BitTextBoxMMIO_LostFocus"/>
+                            <TextBox x:Name="wordTextBox" Grid.Column="2" IsReadOnly="True"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Style="{StaticResource LabelStyle}" Text="Value"/>
+                            <TextBlock Grid.Column="2"  Style="{StaticResource LabelStyle}" Text="Dword (32 bit)"/>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="ValueTextBoxMMIO"  Foreground="#444444" Text="0x00 (Byte) or 0x0000 (Word) or 0x00000000 (Dword)" Grid.Column="0" GotFocus="ValueTextBoxMMIO_GotFocus" LostFocus="ValueTextBoxMMIO_LostFocus"/>
+                            <TextBox x:Name="dwordTextBox" Grid.Column="2" IsReadOnly="True"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="ReadButtonMMIO" Grid.Column="0" Content="Read" 
+                Click="ReadButtonMMIO_Click" Height="36"/>
+                        <Button x:Name="WriteButtonMMIO" Grid.Column="2" Content="Write" 
+                Click="WriteButtonMMIO_Click" Height="36"/>
+                        <Button x:Name="ResetButtonMMIO" Grid.Column="4" Content="Reset" 
+                Click="ResetButtonMMIO_Click" Height="36" Background="#8B5A00" 
+                BorderBrush="#C9A350"/>
+                    </Grid>
+
+                    <Border Background="#1A1A1A" CornerRadius="8" Padding="16" BorderBrush="#30363D" BorderThickness="1" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource HeaderStyle}" Text="Registry"/>
+                            <Grid Name="RegistryMMIOGrid" Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="0" x:Name="TextMMIOBox_0" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_0_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="1" x:Name="TextMMIOBox_1" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_1_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="2" x:Name="TextMMIOBox_2" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_2_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="3" x:Name="TextMMIOBox_3" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_3_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="4" x:Name="TextMMIOBox_4" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_4_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="5" x:Name="TextMMIOBox_5" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_5_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="6" x:Name="TextMMIOBox_6" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_6_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="7" x:Name="TextMMIOBox_7" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_7_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="8" x:Name="TextMMIOBox_8" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_8_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="9" x:Name="TextMMIOBox_9" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_9_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="10" x:Name="TextMMIOBox_10" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_10_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="11" x:Name="TextMMIOBox_11" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_11_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="12" x:Name="TextMMIOBox_12" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_12_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="13" x:Name="TextMMIOBox_13" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_13_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="14" x:Name="TextMMIOBox_14" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_14_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="15" x:Name="TextMMIOBox_15" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_15_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="16" x:Name="TextMMIOBox_16" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_16_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="17" x:Name="TextMMIOBox_17" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_17_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="18" x:Name="TextMMIOBox_18" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_18_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="19" x:Name="TextMMIOBox_19" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_19_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="20" x:Name="TextMMIOBox_20" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_20_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="21" x:Name="TextMMIOBox_21" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_21_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="22" x:Name="TextMMIOBox_22" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_22_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="23" x:Name="TextMMIOBox_23" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_23_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="24" x:Name="TextMMIOBox_24" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_24_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="25" x:Name="TextMMIOBox_25" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_25_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="26" x:Name="TextMMIOBox_26" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_26_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="27" x:Name="TextMMIOBox_27" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_27_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="28" x:Name="TextMMIOBox_28" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_28_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="29" x:Name="TextMMIOBox_29" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_29_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="30" x:Name="TextMMIOBox_30" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_30_MouseDoubleClick"/>
+                                <TextBox TextAlignment="Center" Margin="1" IsReadOnly="True" Grid.Column="31" x:Name="TextMMIOBox_31" Text="0" Background="#1A1A1A" MouseDoubleClick="TextMMIOBox_31_MouseDoubleClick"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Foreground="White" Margin="20,16,20,0" Grid.Row="4" x:Name="ApplyButtonMMIO" Content="Apply" Click="ApplyButtonMMIO_Click" Height="36"/>
+                </StackPanel>
+            </Border>
+
+        </TabItem>
+
+        <TabItem Header="PCI" Background="#1A1A1A" Padding="20,12" HorizontalAlignment="Left">
+            <Border Background="#1A1A1A" CornerRadius="8" Padding="16" BorderBrush="#30363D" BorderThickness="1" Margin="0,16,0,0">
+                <StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition  Width="40"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Style="{StaticResource LabelStyle}" Text="Bus"/>
+                            <TextBlock Grid.Column="2"  Style="{StaticResource LabelStyle}" Text="Byte (8 bit)"/>
+
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition  Width="20"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="BusTextBoxPCI" Grid.Column="0" 
+          Foreground="#444444" Text="0 - 255"                          
+          GotFocus="BusTextBoxPCI_GotFocus" 
+          LostFocus="BusTextBoxPCI_LostFocus"/>
+
+                            <TextBox x:Name="ByteTextBoxPCI" Grid.Column="2" IsReadOnly="True"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition  Width="40"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Style="{StaticResource LabelStyle}" Text="Device"/>
+                            <TextBlock Grid.Column="2"  Style="{StaticResource LabelStyle}" Text="Word (16 bit)"/>
+
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition  Width="20"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="DeviceTextBoxPCI" Grid.Column="0" 
+Foreground="#444444" Text="0 - 31"                                    
+GotFocus="DeviceTextBoxPCI_GotFocus" 
+LostFocus="DeviceTextBoxPCI_LostFocus"/>
+
+                            <TextBox x:Name="WordTextBoxPCI" Grid.Column="2" IsReadOnly="True"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition  Width="40"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Style="{StaticResource LabelStyle}" Text="Function"/>
+                            <TextBlock Grid.Column="2"  Style="{StaticResource LabelStyle}" Text="Dword (32 bit)"/>
+
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition  Width="20"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="FunctionTextBoxPCI" Grid.Column="0" 
+Foreground="#444444"  Text="0 - 7"                                     
+GotFocus="FunctionTextBoxPCI_GotFocus" 
+LostFocus="FunctionTextBoxPCI_LostFocus"/>
+
+                            <TextBox x:Name="DwordTextBoxPCI" Grid.Column="2" IsReadOnly="True"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0" Style="{StaticResource LabelStyle}" Text="Offset"/>
+                        </Grid>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition  Width="20"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="OffsetTextBoxPCI" Grid.Column="0" 
+Foreground="#444444"  Text="0x10 e.g."                                     
+GotFocus="OffsetTextBoxPCI_GotFocus" 
+LostFocus="OffsetTextBoxPCI_LostFocus"/>
+
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,30,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Foreground="White" Margin="0 0 10 0" Grid.Column="0" x:Name="ReadPCIButton" Content="Read" Click="ReadPCIButton_Click" Height="36"/>
+                            <Button Foreground="White" Margin="0 0 10 0" Grid.Column="1" x:Name="ApplyPCIButton" Content="Apply" Click="ApplyPCIButton_Click" Height="36"/>
+                            <Button Foreground="White" Margin="0 0 10 0" Grid.Column="2" x:Name="ResetPCIButton" Content="Reset" Click="ResetButtonPCI_Click" Height="36" BorderBrush="#C9A350" Background="#8B5A00" />
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </TabItem>
+
+        <TabItem Header="Devices" Background="#1A1A1A" Padding="20,12" HorizontalAlignment="Left">
+            <Border Background="#1A1A1A" CornerRadius="8" Padding="16" BorderBrush="#30363D" BorderThickness="1" Margin="0,16,0,0">
+                <StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border
+            Grid.Column="0"
+            Background="#252525"
+            BorderBrush="#3A3A3A"
+            BorderThickness="1"
+            CornerRadius="6"
+            Margin="10"
+            Padding="0"
+            MaxHeight="1080">
+                                <ListBox
+                x:Name="DeviceListBox"
+                Background="#252525"
+                BorderThickness="0"
+                Foreground="#D0D0D0"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                SelectionChanged="DeviceListBox_SelectionChanged"
+                ItemTemplate="{StaticResource PciDeviceTemplate}"/>
+                            </Border>
+
+                            <Border
+            Grid.Column="1"
+            Background="#252525"
+            BorderBrush="#3A3A3A"
+            BorderThickness="1"
+            CornerRadius="6"
+            Margin="10"
+            Padding="12">
+                                <ScrollViewer 
+                VerticalScrollBarVisibility="Auto" 
+                HorizontalScrollBarVisibility="Disabled">
+                                    <TextBox
+                    x:Name="DetailsTextBlock"
+                    TextWrapping="Wrap"
+                    Background="#252525"
+                    Foreground="#D0D0D0"
+                    FontFamily="Courier New"    
+                    FontSize="15"
+                    IsReadOnly="True"/>
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+
+                </StackPanel>
+            </Border>
+        </TabItem>
+    </TabControl>
+</Window>
