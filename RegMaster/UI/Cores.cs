@@ -65,5 +65,14 @@ namespace RegMaster
 
             return count;
         }
+        
+        private bool NoOneCoreIsSelected()
+        {
+            for (int i = 1; i < CoreGrid.Children.Count; i++)
+                if (CoreGrid.Children[i] is CheckBox checkBox && checkBox.IsChecked == true)
+                    return false;
+
+            return true;
+        }
     }
 }

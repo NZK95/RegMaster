@@ -9,9 +9,10 @@ namespace RegMaster
         private void WriteButton_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(ValueTextBox.Text) || string.IsNullOrEmpty(AddressTextBox.Text)
-                || ValueTextBox.Text == "Hex value" || AddressTextBox.Text == "0xE2 e.g.")
+                || ValueTextBox.Text == "Hex value" || AddressTextBox.Text == "0xE2 e.g." ||
+                NoOneCoreIsSelected())
             {
-                MessageBox.Show("Missing input", "Please provide a valid address and value.", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Missing input", "Please provide a valid address, value and core.", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
