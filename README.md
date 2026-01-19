@@ -27,7 +27,7 @@
 ### MSR
 1. Select target core
 > For read operation, if `All cores` checkbox is selected, no core is selected or there are selected more than 1 core, it will be read on core 0.
-2. Enter `MS`R index in Address field (e.g., `0x1a0`)
+2. Enter `MSR` index in Address field (e.g., `0x1a0`)
 3. Enter bit value (`Bitfield` or `single bit`) (if needed) — by default, the full bitmask is displayed
 4. Click `Read` button to display current value
 5. Modify value in `EAX/EDX` registers
