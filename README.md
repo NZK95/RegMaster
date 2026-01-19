@@ -9,7 +9,8 @@
 > `WinRing0` and `inpoutx64` drivers may be blocked on Windows 11 22h2 and later, set `VulnerableDriverBlocklistEnable` to  0 in `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CI\Config` to remove this limitation.
 
 ## Known Issues
-- `Devices` tab may not work properly, especially device/vendor ids
+- `Devices` tab may not work properly, especially device/vendor ids, so look at BDF address
+
   
 ## Resources & Credits
 Inspired by [chiptool](https://github.com/LuSlower/chiptool/tree/main)
