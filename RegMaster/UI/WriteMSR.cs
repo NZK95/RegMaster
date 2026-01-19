@@ -27,7 +27,7 @@ namespace RegMaster
                 else
                     cores = GetCores();
 
-                if (string.IsNullOrEmpty(bit))
+                if (string.IsNullOrEmpty(bit) || bit == "15 or 0 - 10")
                     ElaborateNoBit(address, value, cores);
 
                 else if (bit.Contains('-'))

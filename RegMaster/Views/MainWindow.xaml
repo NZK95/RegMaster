@@ -29,7 +29,6 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Device Name (BDF + Vendor + Device) -->
                     <TextBlock Grid.Column="0" Grid.Row="0"
                        Text="{Binding DisplayName}"
                        Foreground="#D0D0D0"
@@ -37,7 +36,6 @@
                        FontWeight="Medium"
                        TextTrimming="CharacterEllipsis"/>
 
-                    <!-- Vendor ID and Device ID -->
                     <TextBlock Grid.Column="0" Grid.Row="1"
                        Text="{Binding Details}"
                        Foreground="#707070"
@@ -45,7 +43,6 @@
                        Margin="0,4,0,0"
                        TextTrimming="CharacterEllipsis"/>
 
-                    <!-- Status Indicator (Right) -->
                     <StackPanel Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
                         VerticalAlignment="Center"
                         Margin="16,0,0,0"
@@ -63,7 +60,6 @@
             </Border>
 
             <DataTemplate.Triggers>
-                <!-- Hover Effect -->
                 <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}}" Value="True">
                     <Setter TargetName="DeviceBorder" Property="Background" Value="#3A3A3A"/>
                     <Setter TargetName="DeviceBorder" Property="BorderBrush" Value="#888888"/>
@@ -71,7 +67,6 @@
             </DataTemplate.Triggers>
         </DataTemplate>
 
-        <!-- ListBox Style для PCI Devices -->
         <Style TargetType="ListBox" x:Key="PciDeviceListBoxStyle">
             <Setter Property="Background" Value="#1A1A1A"/>
             <Setter Property="BorderBrush" Value="#3A3A3A"/>
@@ -139,13 +134,11 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <!-- Tab Header Background -->
                             <Border Grid.Row="0" Background="#252525" BorderBrush="#3A3A3A" 
                                     BorderThickness="0,0,0,1" Padding="0">
                                 <TabPanel IsItemsHost="True" Margin="20,0,20,0"/>
                             </Border>
 
-                            <!-- Tab Content -->
                             <ContentPresenter Grid.Row="1" x:Name="PART_SelectedContentHost" 
                                             ContentSource="SelectedContent" Margin="0"/>
                         </Grid>
@@ -154,7 +147,6 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для TabItem -->
         <Style TargetType="TabItem">
             <Setter Property="Foreground" Value="#909090"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -194,7 +186,6 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для TextBox -->
         <Style TargetType="TextBox">
             <Setter Property="Background" Value="#1A1A1A"/>
             <Setter Property="Foreground" Value="#D0D0D0"/>
@@ -227,7 +218,6 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для Button -->
         <Style TargetType="Button">
             <Setter Property="Background" Value="#505050"/>
             <Setter Property="Foreground" Value="#E0E0E0"/>
@@ -259,7 +249,6 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для CheckBox -->
         <Style TargetType="CheckBox">
             <Setter Property="Foreground" Value="#D0D0D0"/>
             <Setter Property="FontSize" Value="13"/>
@@ -304,7 +293,6 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для TextBlock (лейбл) -->
         <Style TargetType="TextBlock" x:Key="LabelStyle">
             <Setter Property="Foreground" Value="#909090"/>
             <Setter Property="FontSize" Value="12"/>
