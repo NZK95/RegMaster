@@ -9,10 +9,10 @@
 > `WinRing0` and `inpoutx64` drivers may be blocked on Windows 11 22h2 and later, set `VulnerableDriverBlocklistEnable` to  0 in `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CI\Config` to remove this limitation.
 
 ## Features
-R/W MSR registers on different cores
-R/W MMIO data for 8, 16 or 32 bit operations
-Read PCI Configuration Space registers for byte, word or dword
-Scan and enumerate all PCI devices
+- R/W MSR registers on different cores
+- R/W MMIO data for 8, 16 or 32 bit operations
+- Read PCI Configuration Space registers for byte, word or dword
+- Scan and enumerate all PCI devices
 
 ## Known Issues
 - `Devices` tab may not work properly, especially device/vendor ids, so look at BDF address
