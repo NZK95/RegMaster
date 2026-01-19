@@ -11,7 +11,7 @@
 ## Features
 R/W MSR registers on different cores
 R/W MMIO data for 8, 16 or 32 bit operations
-R/W PCI Configuration Space registers for byte, word or dword
+Read PCI Configuration Space registers for byte, word or dword
 Scan and enumerate all PCI devices
 
 ## Known Issues
@@ -24,6 +24,29 @@ Scan and enumerate all PCI devices
 
 ## Usage
 
+### MSR
+1. Select target core
+> For read operation, if `All cores` checkbox is selected, no core is selected or there are selected more than 1 core, it will be read on core 0.
+2. Enter `MS`R index in Address field (e.g., `0x1a0`)
+3. Enter bit value (`Bitfield` or `single bit`) (if needed) — by default, the full bitmask is displayed
+4. Click `Read` button to display current value
+5. Modify value in `EAX/EDX` registers
+6. Click `Apply` button to write changes back
+7. Use `Reset` button to restore text boxes to default values
+
+### MMIO
+1. Enter memory address in the `Address field`
+2. Enter bit value (`Bitfield` or `single bit`) (if needed) — by default, the full bitmask is displayed
+3. For write operations, after the `0x` prefix, enter 2 digits for `Byte` values (e.g., `0x11`), 4 for `Word` (`0x10FA`), or 8 for `Dword` (`0x00000001`)
+4. Click `Read` button to display the current value as a full bitmask in Byte, Word, and Dword format
+5. Use the registry section at the bottom to modify individual bits and click `Apply` button to save changes
+6. Click `Reset` button to restore text boxes to default values
+   
+### PCI Configuration
+1. Enter `Bus:Device:Function` values
+2. Enter `offset` value
+3. Click `Read` button to display register value
+4. Use `Reset` button to restore text boxes to default values
 
 ## Resources & Credits
 Inspired by [chiptool](https://github.com/LuSlower/chiptool/tree/main)
