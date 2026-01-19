@@ -39,6 +39,8 @@ PID - В чипсете находится более 50 компонентов,
 ## Использование
 Для изменения значений в регистрах **PCR**, необходимо вычислить адрес в памяти: ``` SBREG_BAR + (PID << 16) + Offset  ```. Дальше работать с ним как с обычным регистром в MMIO, следуя документацию.
 
+> На данный момент RegMaster не поддерживает работу с PCR, по причине блокировки доступа к его регистрам.
+
 ## Ссылки
 - [Intel Leak](https://sizeof.cat/post/intel-alder-lake-bios-sourcecode-leak/)
 - [1](https://lab.whitequark.org/notes/2017-11-08/accessing-intel-ich-pch-gpios/#:~:text=%2Asbreg_addr%20%3D%20d31f1,08lx%22%2C%20%2Asbreg_addr)
