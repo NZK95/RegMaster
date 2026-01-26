@@ -19,7 +19,7 @@
 - `Devices` tab may not work properly, especially device/vendor ids, so look at BDF address
 
 ## Requirements
-- Windows 10 or higher
+- Windows x64
 - Administrator privileges
 - Last version of **RegMaster** from [`releases`](https://github.com/NZK95/RegMaster/releases) <br>
 
