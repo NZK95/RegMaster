@@ -1,3 +1,4 @@
+> Disclaimer: The information provided here is a collection of research notes and personal observations. Accuracy is not guaranteed.
 ### PCR  — это специальные приватные регистры чипсета, которые находятся в приватной памяти чипсета, предназначены для конфигурации внутренних подсистем (GPIO, PMC, USB, SATA, DCI и др.) и доступны через **SBI** (Sideband Interface) или **P2SB** (Primary to Sideband Bridge). <br> Эти регистры адресуются через **PID** (Port ID) и оффсет смещения. 
 
 ---
