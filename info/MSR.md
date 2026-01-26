@@ -1,3 +1,4 @@
+> Disclaimer: The information provided here is a collection of research notes and personal observations. Accuracy is not guaranteed.
 ### **MSR** (Model-Specific Register) — это специальные регистры, используемые для управления внутренними параметрами процессора. 
 ---
 Как и другие регистры, MSR представляют собой битмаску (обычно в виде значений, таких как `eax` и `edx`), где каждый бит или группа битов (bitfield) отвечает за конкретную функцию или настройку. <br>
