@@ -1,3 +1,4 @@
+> Disclaimer: The information provided here is a collection of research notes and personal observations. Accuracy is not guaranteed.
 ### PCI (PCI Express) — это шина для подключения периферийных устройств, где каждое устройство находится в конфигурационном пространстве и имеет уникальный адрес в формате **Bus:Device:Function (BDF)**.
 
 ---
