@@ -1,6 +1,7 @@
 # RegMaster
 [![Downloads](https://img.shields.io/github/downloads/NZK95/RegMaster/total.svg)](https://github.com/NZK95/RegMaster/releases)
 
+![](https://github.com/NZK95/RegMaster/blob/master/images/RegMaster%20%231.png)
 > ### Disclaimer
 > The author is not responsible for any possible damage caused to hardware as a result of using this project. <br>
 > This software does not guarantee any increase in performance and is intended for enthusiasts only. <br>
