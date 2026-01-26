@@ -1,3 +1,4 @@
+> Disclaimer: The information provided here is a collection of research notes and personal observations. Accuracy is not guaranteed.
 ### **MMIO (Memory-Mapped I/O)** — это метод доступа к регистрам устройства через адресное пространство памяти. Вместо использования специальных портов ввода-вывода (как в случае с MSR), устройство маппирует свои регистры на конкретные адреса оперативной памяти, к которым можно обращаться как к обычной памяти.
 ---
 Для работы нужно:
