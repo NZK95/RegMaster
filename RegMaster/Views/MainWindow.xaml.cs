@@ -1,5 +1,6 @@
 ﻿using OpenLibSys;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.JavaScript;
@@ -846,6 +847,17 @@ namespace RegMaster
         private void TextMMIOBox_31_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             TextBox_MouseDoubleClick(sender, e);
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            var process = new ProcessStartInfo()
+            {
+                FileName = e.Uri.AbsoluteUri,
+                UseShellExecute = true
+            };
+
+            Process.Start(process);
         }
     }
 }

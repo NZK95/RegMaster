@@ -924,5 +924,15 @@ LostFocus="OffsetTextBoxPCI_LostFocus"/>
                 </StackPanel>
             </Border>
         </TabItem>
+
+        <TabItem Header="About" Background="#1A1A1A" Padding="20,12" HorizontalAlignment="Left">
+            <Border Background="#1A1A1A" CornerRadius="8" Padding="16" BorderBrush="#30363D" BorderThickness="1" Margin="0,16,0,0">
+                <TextBlock HorizontalAlignment="Center" Foreground="Red">           
+                    <Hyperlink NavigateUri="https://www.github.com/NZK95" RequestNavigate="Hyperlink_RequestNavigate">
+                        Made by NZK95
+                    </Hyperlink>
+                </TextBlock>
+            </Border>
+        </TabItem>
     </TabControl>
 </Window>
