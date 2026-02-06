@@ -49,8 +49,10 @@
 3. Click `Read` button to display register value
 4. Use `Reset` button to restore text boxes to default values
 
-## Resources & Credits
+## Credits
 Inspired by [chiptool](https://github.com/LuSlower/chiptool/tree/main) <br>
+
+## Resources
 - [Intel SDM (Software Developer's Manual)](https://www.intel.com/content/dam/develop/external/us/en/documents/335592-sdm-vol-4.pdf).
 - [Intel Leak](https://sizeof.cat/post/intel-alder-lake-bios-sourcecode-leak/)
 - [1](https://lab.whitequark.org/notes/2017-11-08/accessing-intel-ich-pch-gpios/#:~:text=%2Asbreg_addr%20%3D%20d31f1,08lx%22%2C%20%2Asbreg_addr)
