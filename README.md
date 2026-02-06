@@ -50,7 +50,10 @@
 4. Use `Reset` button to restore text boxes to default values
 
 ## Resources & Credits
-Inspired by [chiptool](https://github.com/LuSlower/chiptool/tree/main)
+Inspired by [chiptool](https://github.com/LuSlower/chiptool/tree/main) <br> <br>
+- [xHCI Specification](https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/extensible-host-controler-interface-usb-xhci.pdf)
+- [PCI Configuration Space](https://en.wikipedia.org/wiki/PCI_configuration_space)
+
 
 ## Troubleshooting
 If you encounter errors or bugs, please report them via the [issue tracker](https://github.com/NZK95/RegMaster/issues).<br>
