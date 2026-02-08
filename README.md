@@ -52,17 +52,6 @@
 ## Credits
 Inspired by [chiptool](https://github.com/LuSlower/chiptool/tree/main) <br>
 
-## Resources
-- [Intel SDM (Software Developer's Manual)](https://www.intel.com/content/dam/develop/external/us/en/documents/335592-sdm-vol-4.pdf).
-- [Intel Leak](https://sizeof.cat/post/intel-alder-lake-bios-sourcecode-leak/)
-- [xHCI Specification](https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/extensible-host-controler-interface-usb-xhci.pdf)
-- [PCI Configuration Space](https://en.wikipedia.org/wiki/PCI_configuration_space)
-- [PCI Configuration Space](https://en.wikipedia.org/wiki/PCI_configuration_space)
-- [PCI IDS](https://pci-ids.ucw.cz/)
-- [1](https://lab.whitequark.org/notes/2017-11-08/accessing-intel-ich-pch-gpios/#:~:text=%2Asbreg_addr%20%3D%20d31f1,08lx%22%2C%20%2Asbreg_addr)
-- [2](https://xairy.io/articles/thinkpad-xdci#:~:text)
-
-
 ## Troubleshooting
 If you encounter errors or bugs, please report them via the [issue tracker](https://github.com/NZK95/RegMaster/issues).<br>
 Sometimes, after reading/writing to some registries you can have BSOD screen. Just reboot your system. <br>
