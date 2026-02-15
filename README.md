@@ -8,10 +8,9 @@
 > You use this program at your own risk. <br>
 
 `WinRing0` and `inpoutx64` drivers may be blocked on Windows 11 22h2 and later, to bypass:
-    ```bat
+```bat
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Config" /v "VulnerableDriverBlocklistEnable" /t REG_DWORD /d "0" /f
-    ```
-
+```
 ## Features
 - R/W MSR registers on different cores
 - R/W MMIO data for 8, 16 or 32 bit operations
