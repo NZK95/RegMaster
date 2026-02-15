@@ -7,7 +7,7 @@
 > This software does not guarantee any increase in performance and is intended for enthusiasts only. <br>
 > You use this program at your own risk. <br>
 
-> `WinRing0` and `inpoutx64` drivers may be blocked on Windows 11 22h2 and later, to bypass:
+`WinRing0` and `inpoutx64` drivers may be blocked on Windows 11 22h2 and later, to bypass:
     ```bat
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Config" /v "VulnerableDriverBlocklistEnable" /t REG_DWORD /d "0" /f
     ```
