@@ -23,7 +23,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Config" /v "VulnerableDriverBl
 
 ## Known Issues
 - `Devices` tab may not work properly, especially device/vendor ids, so look at BDF address
-
+- RegMasger is tested only on systems with HT/SMT disables
 ## Requirements
 - Windows x64
 - Administrator privileges
