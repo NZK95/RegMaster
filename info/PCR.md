@@ -43,6 +43,9 @@ PID - В чипсете находится более 50 компонентов,
 > На данный момент RegMaster не поддерживает работу с PCR, по причине блокировки доступа к его регистрам.
 
 ## Ссылки
-- [Intel Leak](https://sizeof.cat/post/intel-alder-lake-bios-sourcecode-leak/)
 - [1](https://lab.whitequark.org/notes/2017-11-08/accessing-intel-ich-pch-gpios/#:~:text=%2Asbreg_addr%20%3D%20d31f1,08lx%22%2C%20%2Asbreg_addr)
 - [2](https://xairy.io/articles/thinkpad-xdci#:~:text)
+<details>
+<summary>INTEL LEAK</summary>
+magnet:?xt=urn:btih:41d48b1d27079c2e545cd53181c0d826a7a68af2&dn=ICE_TEA_BIOS-master.zip&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2F9.rarbg.com%3A2810%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce
+</details>
