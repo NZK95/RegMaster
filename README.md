@@ -56,9 +56,14 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Config" /v "VulnerableDriverBl
 4. Use `Reset` button to restore text boxes to default values
 
 ## Useful Links
-Intel Alder Lake leak  <br>
+**Intel Alder Lake leak**  <br>
 ```bat
 magnet:?xt=urn:btih:41d48b1d27079c2e545cd53181c0d826a7a68af2&dn=ICE_TEA_BIOS-master.zip&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2F9.rarbg.com%3A2810%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce
+```
+
+** MSI leak** <br>
+```bat
+magnet:?xt=urn:btih:C4198D4FFFEBBE43673C2179016E6ABC3D50F65D&dn=MSI
 ```
 
 ## Credits
